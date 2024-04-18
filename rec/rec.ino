@@ -106,6 +106,8 @@ uint16_t rw_position = 0;
 
 enum Mode {Record, Play} mode;
 
+uint32_t averaged_adc = 0;
+
 
 void setup()
 {
@@ -182,7 +184,7 @@ void setup_adc(void)
 
   ADCSRA |= (1 << ADPS2) | (1 << ADPS0); // Set ADC clock with 32 prescaler -> 16mHz / 32 = 500kHz.
   ADCSRA |= (1 << ADATE); // Enable auto trigger.
-  //ADCSRA |= (1 << ADIE);  // Enable interrupts when measurement complete.
+  ADCSRA |= (1 << ADIE);  // Enable interrupts when measurement complete.
   ADCSRA |= (1 << ADEN);  // Enable ADC.
   ADCSRA |= (1 << ADSC);  // Start ADC measurements.
 
@@ -227,7 +229,7 @@ void record_new_sample(void)
 {
   if (rw_position < MAX_SAMPLES)
   {
-    samples[rw_position] = ADC;
+    samples[rw_position] = averaged_adc >> 4;
 
     #ifdef DEBUG
       Serial.print(F("REC: "));
@@ -337,3 +339,16 @@ ISR(ADC_vect) {       // When new ADC value ready.
   #endif
 }
 */
+
+ISR(ADC_vect)
+{
+  // When new ADC value ready.
+  uint16_t reading = ADC;
+  // moving average
+  averaged_adc = reading + averaged_adc - ((averaged_adc - 8) >> 4);
+  // remember to divide by 16 (>> 4)
+
+  //Serial.println(reading);
+  //Serial.print(",");
+  //Serial.println(averaged_adc >> 4);
+}
