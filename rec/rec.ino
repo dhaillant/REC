@@ -55,12 +55,6 @@
 #define CLOCK_LED_PIN     6
 #define RESET_LED_PIN     7
 
-#define PLAY_REC_LED_BIT  PD5
-#define CLOCK_LED_BIT     PD6
-#define RESET_LED_BIT     PD7
-
-
-
 // PWM pins
 #define PITCH_MSB_PIN   9   // D9/D10 (output 5)
 #define PITCH_LSB_PIN   10  // D9/D10 (output 5)
